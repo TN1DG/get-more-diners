@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Chef hat top (puffy part) -->
+  <path d="M32 4C27 4 23 7 21.6 11C18.6 11.6 16 14 16 17C16 21 19 24 23 24H41C45 24 48 21 48 17C48 14 45.4 11.6 42.4 11C41 7 37 4 32 4Z" fill="#3B82F6"/>
+  
+  <!-- Chef hat base (tall part) -->
+  <path d="M20 24V52C20 54.2 21.8 56 24 56H40C42.2 56 44 54.2 44 52V24H20Z" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2"/>
+  
+  <!-- Chef hat lines (decorative) -->
+  <path d="M20 36H44" stroke="#3B82F6" stroke-width="2"/>
+  <path d="M20 44H44" stroke="#3B82F6" stroke-width="2"/>
+</svg>
