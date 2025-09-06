@@ -1,5 +1,6 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { LandingPage } from './components/LandingPage'
@@ -17,6 +18,7 @@ const Settings = () => <div className="p-6"><h2 className="text-2xl font-bold">S
 
 const AppRoutes: React.FC = () => {
   const { user, loading } = useAuth()
+  const location = useLocation()
 
   if (loading) {
     return (
@@ -27,29 +29,31 @@ const AppRoutes: React.FC = () => {
   }
 
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <SignUp />} />
-      
-      {/* Protected dashboard routes */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <DashboardLayout />
-        </ProtectedRoute>
-      }>
-        <Route index element={<Dashboard />} />
-        <Route path="profile" element={<RestaurantProfile />} />
-        <Route path="diners" element={<FindDiners />} />
-        <Route path="campaigns/new" element={<CreateCampaign />} />
-        <Route path="campaigns" element={<PastCampaigns />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
-      
-      {/* Catch all route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <AnimatePresence mode="wait" initial={false}>
+      <Routes location={location} key={location.pathname}>
+        {/* Public routes */}
+        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+        <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <SignUp />} />
+        
+        {/* Protected dashboard routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Dashboard />} />
+          <Route path="profile" element={<RestaurantProfile />} />
+          <Route path="diners" element={<FindDiners />} />
+          <Route path="campaigns/new" element={<CreateCampaign />} />
+          <Route path="campaigns" element={<PastCampaigns />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+        
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
   )
 }
 

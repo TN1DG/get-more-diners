@@ -1,102 +1,211 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { Button } from './ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { ChefHat, Users, MessageCircle, Mail, Smartphone, Target, BarChart3 } from 'lucide-react'
+import { AnimatedSection } from './animations/AnimatedSection'
+import { AnimatedButton } from './animations/AnimatedButton'
+import { AnimatedCard } from './animations/AnimatedCard'
+import { PageTransition } from './animations/PageTransition'
+import { fadeInVariants, slideUpVariants, staggerContainerVariants, slideInLeftVariants, slideInRightVariants } from '../lib/animations'
 
 export const LandingPage: React.FC = () => {
+  const { scrollY } = useScroll()
+  const heroY = useTransform(scrollY, [0, 500], [0, -150])
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0.3])
+
   return (
-    <div className="min-h-screen bg-background">
+    <PageTransition className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-cream-300">
+      <motion.header 
+        className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-cream-300"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <Link to="/" className="flex items-center hover:opacity-80 transition-all duration-300">
-              <ChefHat className="h-9 w-9 text-primary" />
-              <span className="ml-3 text-2xl font-serif font-semibold text-foreground">Get More Diners</span>
-            </Link>
-            <div className="hidden md:flex items-center space-x-6">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Link to="/" className="flex items-center hover:opacity-80 transition-all duration-300">
+                <ChefHat className="h-9 w-9 text-primary" />
+                <span className="ml-3 text-2xl font-serif font-semibold text-foreground">Get More Diners</span>
+              </Link>
+            </motion.div>
+            <motion.div 
+              className="hidden md:flex items-center space-x-6"
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <Link to="/login" className="text-muted-foreground hover:text-foreground transition-colors duration-200 font-medium">
                 Sign In
               </Link>
               <Link to="/signup">
-                <Button className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl font-medium shadow-button transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                <AnimatedButton className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-xl font-medium shadow-button">
                   Get Started
-                </Button>
+                </AnimatedButton>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cream-50 via-background to-cream-100 opacity-60"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(220,104,68,0.1),transparent_50%)] opacity-40"></div>
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-br from-cream-50 via-background to-cream-100 opacity-60"
+          style={{ y: heroY, opacity: heroOpacity }}
+        ></motion.div>
+        <motion.div 
+          className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(220,104,68,0.1),transparent_50%)] opacity-40"
+          style={{ y: useTransform(scrollY, [0, 500], [0, -100]) }}
+        ></motion.div>
         
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-32">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="font-serif font-bold text-hero md:text-7xl lg:text-8xl text-foreground mb-8 leading-tight">
+            <motion.h1 
+              className="font-serif font-bold text-hero md:text-7xl lg:text-8xl text-foreground mb-8 leading-tight"
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+            >
               Fill Every Table,{' '}
-              <span className="text-primary relative">
+              <motion.span 
+                className="text-primary relative"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.8, ease: "backOut" }}
+              >
                 Every Night
-                <svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 300 12" fill="none">
-                  <path d="M3 9C118 1 180 1 297 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="text-amber-400 opacity-60" />
-                </svg>
-              </span>
-            </h1>
+                <motion.svg 
+                  className="absolute -bottom-2 left-0 w-full h-3" 
+                  viewBox="0 0 300 12" 
+                  fill="none"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.2, delay: 1.5, ease: "easeInOut" }}
+                >
+                  <path 
+                    d="M3 9C118 1 180 1 297 9" 
+                    stroke="currentColor" 
+                    strokeWidth="3" 
+                    strokeLinecap="round" 
+                    className="text-amber-400 opacity-60" 
+                  />
+                </motion.svg>
+              </motion.span>
+            </motion.h1>
             
-            <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+            <motion.p 
+              className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+            >
               Connect with hungry diners in your area using AI-powered marketing campaigns. 
               Send personalized offers via email and SMS to bring customers back to your restaurant.
-            </p>
+            </motion.p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12"
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.9, ease: "easeOut" }}
+            >
               <Link to="/signup">
-                <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg font-semibold rounded-2xl shadow-button transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <AnimatedButton 
+                  className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg font-semibold rounded-2xl shadow-button"
+                  size="lg"
+                >
                   Start Free Trial
                   <ChefHat className="ml-2 h-5 w-5" />
-                </Button>
+                </AnimatedButton>
               </Link>
-              <Button variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300">
+              <AnimatedButton 
+                variant="outline" 
+                className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 text-lg font-semibold rounded-2xl"
+                size="lg"
+              >
                 Watch Demo
                 <svg className="ml-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-              </Button>
-            </div>
+              </AnimatedButton>
+            </motion.div>
             
-            <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
-              <div className="flex items-center">
+            <motion.div 
+              className="flex items-center justify-center space-x-8 text-sm text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1.2 }}
+            >
+              <motion.div 
+                className="flex items-center"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 1.4 }}
+              >
                 <svg className="h-5 w-5 text-sage-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
                 No credit card required
-              </div>
-              <div className="flex items-center">
+              </motion.div>
+              <motion.div 
+                className="flex items-center"
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 1.6 }}
+              >
                 <svg className="h-5 w-5 text-sage-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
                 14-day free trial
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
         
         {/* Decorative Elements */}
-        <div className="absolute top-20 left-10 opacity-20">
+        <motion.div 
+          className="absolute top-20 left-10 opacity-20"
+          animate={{ 
+            y: [0, -20, 0], 
+            rotate: [0, 10, 0] 
+          }}
+          transition={{ 
+            duration: 6, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+        >
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600"></div>
-        </div>
-        <div className="absolute bottom-20 right-10 opacity-20">
+        </motion.div>
+        <motion.div 
+          className="absolute bottom-20 right-10 opacity-20"
+          animate={{ 
+            y: [0, 15, 0], 
+            rotate: [0, -10, 0] 
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity, 
+            ease: "easeInOut",
+            delay: 2 
+          }}
+        >
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-terracotta-400 to-terracotta-600"></div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Features Section */}
       <section className="py-24 bg-white relative">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-20">
+          <AnimatedSection animation="slideUp" className="text-center mb-20">
             <h2 className="font-serif font-bold text-display text-foreground mb-6">
               Everything you need to grow your restaurant
             </h2>
@@ -104,72 +213,86 @@ export const LandingPage: React.FC = () => {
               From finding the right customers to crafting compelling offers, 
               we've got all the tools you need in one elegant platform.
             </p>
-          </div>
+          </AnimatedSection>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="group hover:shadow-elegant transition-all duration-300 hover:-translate-y-2 bg-white border-cream-300 rounded-2xl overflow-hidden">
-              <CardHeader className="p-8 text-center">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+          <motion.div 
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+            variants={staggerContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <motion.div variants={slideUpVariants}>
+              <AnimatedCard className="p-8 text-center border-cream-300 rounded-2xl overflow-hidden">
+                <motion.div 
+                  className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mb-6"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <Users className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-xl font-serif font-semibold text-foreground mb-4">Smart Diner Search</CardTitle>
-              </CardHeader>
-              <CardContent className="px-8 pb-8">
-                <CardDescription className="text-muted-foreground leading-relaxed">
+                </motion.div>
+                <h3 className="text-xl font-serif font-semibold text-foreground mb-4">Smart Diner Search</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Find diners in your area by location, interests, and dining preferences. 
                   Target the customers most likely to visit your restaurant.
-                </CardDescription>
-              </CardContent>
-            </Card>
+                </p>
+              </AnimatedCard>
+            </motion.div>
             
-            <Card className="group hover:shadow-elegant transition-all duration-300 hover:-translate-y-2 bg-white border-cream-300 rounded-2xl overflow-hidden">
-              <CardHeader className="p-8 text-center">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <motion.div variants={slideUpVariants}>
+              <AnimatedCard className="p-8 text-center border-cream-300 rounded-2xl overflow-hidden">
+                <motion.div 
+                  className="mx-auto w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mb-6"
+                  whileHover={{ scale: 1.1, rotate: -5 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <MessageCircle className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-xl font-serif font-semibold text-foreground mb-4">AI-Powered Copy</CardTitle>
-              </CardHeader>
-              <CardContent className="px-8 pb-8">
-                <CardDescription className="text-muted-foreground leading-relaxed">
+                </motion.div>
+                <h3 className="text-xl font-serif font-semibold text-foreground mb-4">AI-Powered Copy</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Generate compelling marketing messages with AI. Create personalized 
                   offers that resonate with your target audience.
-                </CardDescription>
-              </CardContent>
-            </Card>
+                </p>
+              </AnimatedCard>
+            </motion.div>
             
-            <Card className="group hover:shadow-elegant transition-all duration-300 hover:-translate-y-2 bg-white border-cream-300 rounded-2xl overflow-hidden">
-              <CardHeader className="p-8 text-center">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-terracotta-500 to-terracotta-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <motion.div variants={slideUpVariants}>
+              <AnimatedCard className="p-8 text-center border-cream-300 rounded-2xl overflow-hidden">
+                <motion.div 
+                  className="mx-auto w-16 h-16 bg-gradient-to-br from-terracotta-500 to-terracotta-600 rounded-2xl flex items-center justify-center mb-6"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <div className="flex space-x-1">
                     <Mail className="h-4 w-4 text-white" />
                     <Smartphone className="h-4 w-4 text-white" />
                   </div>
-                </div>
-                <CardTitle className="text-xl font-serif font-semibold text-foreground mb-4">Multi-Channel Outreach</CardTitle>
-              </CardHeader>
-              <CardContent className="px-8 pb-8">
-                <CardDescription className="text-muted-foreground leading-relaxed">
+                </motion.div>
+                <h3 className="text-xl font-serif font-semibold text-foreground mb-4">Multi-Channel Outreach</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Send campaigns via email and SMS to maximize reach. 
                   Connect with diners on their preferred communication channels.
-                </CardDescription>
-              </CardContent>
-            </Card>
+                </p>
+              </AnimatedCard>
+            </motion.div>
             
-            <Card className="group hover:shadow-elegant transition-all duration-300 hover:-translate-y-2 bg-white border-cream-300 rounded-2xl overflow-hidden">
-              <CardHeader className="p-8 text-center">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <motion.div variants={slideUpVariants}>
+              <AnimatedCard className="p-8 text-center border-cream-300 rounded-2xl overflow-hidden">
+                <motion.div 
+                  className="mx-auto w-16 h-16 bg-gradient-to-br from-sage-500 to-sage-600 rounded-2xl flex items-center justify-center mb-6"
+                  whileHover={{ scale: 1.1, rotate: -5 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <BarChart3 className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-xl font-serif font-semibold text-foreground mb-4">Campaign Analytics</CardTitle>
-              </CardHeader>
-              <CardContent className="px-8 pb-8">
-                <CardDescription className="text-muted-foreground leading-relaxed">
+                </motion.div>
+                <h3 className="text-xl font-serif font-semibold text-foreground mb-4">Campaign Analytics</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Track the performance of your campaigns and see which offers 
                   drive the most bookings and revenue.
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
+                </p>
+              </AnimatedCard>
+            </motion.div>
+          </motion.div>
         </div>
         
         {/* Subtle Background Pattern */}
@@ -369,6 +492,6 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </PageTransition>
   )
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
 import { 
@@ -12,6 +13,11 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { PageTransition } from '../animations/PageTransition'
+import { AnimatedCard } from '../animations/AnimatedCard'
+import { AnimatedButton } from '../animations/AnimatedButton'
+import { AnimatedSection } from '../animations/AnimatedSection'
+import { staggerContainerVariants, slideUpVariants, fadeInVariants } from '../../lib/animations'
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth()
@@ -103,33 +109,62 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <PageTransition className="space-y-8">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-br from-white via-cream-50 to-amber-50/30 rounded-2xl p-8 shadow-card border border-cream-200">
-        <h2 className="text-4xl font-serif font-bold text-foreground mb-3">
+      <AnimatedSection animation="slideUp" className="bg-gradient-to-br from-white via-cream-50 to-amber-50/30 rounded-2xl p-8 shadow-card border border-cream-200">
+        <motion.h2 
+          className="text-4xl font-serif font-bold text-foreground mb-3"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
           Welcome back, {restaurant.name}!
-        </h2>
-        <p className="text-xl text-muted-foreground leading-relaxed">
+        </motion.h2>
+        <motion.p 
+          className="text-xl text-muted-foreground leading-relaxed"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
           Here's what's happening with your restaurant marketing today.
-        </p>
-      </div>
+        </motion.p>
+      </AnimatedSection>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-white rounded-2xl shadow-card border border-cream-200 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-6">
-            <CardTitle className="text-base font-semibold text-muted-foreground">Total Campaigns</CardTitle>
-            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl">
-              <MessageSquare className="h-6 w-6 text-primary" />
-            </div>
-          </CardHeader>
-          <CardContent className="pb-6">
-            <div className="text-3xl font-serif font-bold text-foreground mb-1">{stats.totalCampaigns}</div>
-            <p className="text-sm text-muted-foreground">
-              {stats.campaignsThisMonth} this month
-            </p>
-          </CardContent>
-        </Card>
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        variants={staggerContainerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+      >
+        <motion.div variants={slideUpVariants}>
+          <AnimatedCard className="bg-white rounded-2xl shadow-card border border-cream-200">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-6">
+              <CardTitle className="text-base font-semibold text-muted-foreground">Total Campaigns</CardTitle>
+              <motion.div 
+                className="p-3 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <MessageSquare className="h-6 w-6 text-primary" />
+              </motion.div>
+            </CardHeader>
+            <CardContent className="pb-6">
+              <motion.div 
+                className="text-3xl font-serif font-bold text-foreground mb-1"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 100, delay: 0.2 }}
+              >
+                {stats.totalCampaigns}
+              </motion.div>
+              <p className="text-sm text-muted-foreground">
+                {stats.campaignsThisMonth} this month
+              </p>
+            </CardContent>
+          </AnimatedCard>
+        </motion.div>
 
         <Card className="bg-white rounded-2xl shadow-card border border-cream-200 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-6">
@@ -175,7 +210,7 @@ export const Dashboard: React.FC = () => {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 gap-6">
@@ -268,6 +303,6 @@ export const Dashboard: React.FC = () => {
           )}
         </CardContent>
       </Card>
-    </div>
+    </PageTransition>
   )
 }
