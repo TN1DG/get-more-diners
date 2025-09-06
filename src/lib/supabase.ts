@@ -1,7 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL!
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'placeholder-key'
+
+// Check if we have real credentials
+const hasRealCredentials = supabaseUrl !== 'https://placeholder.supabase.co' && supabaseAnonKey !== 'placeholder-key'
+
+if (!hasRealCredentials && process.env.NODE_ENV === 'production') {
+  console.warn('Supabase credentials not configured. Some features may not work.')
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
