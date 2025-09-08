@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { checkSupabaseConfig } from '../utils/diagnostics'
 
 interface AuthContextType {
   user: User | null
@@ -27,12 +28,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Run diagnostics in development
+    if (process.env.NODE_ENV === 'development') {
+      checkSupabaseConfig()
+    }
+
     // Get initial session
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) {
+          console.error('Error getting session:', error)
+        }
+        setSession(session)
+        setUser(session?.user ?? null)
+      } catch (error) {
+        console.error('Failed to get session:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     getSession()
@@ -58,9 +72,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           data: userData,
         },
       })
+      
+      if (error) {
+        console.error('Supabase signUp error:', error)
+      }
+      
       return { error }
     } catch (error) {
-      return { error }
+      console.error('SignUp catch block error:', error)
+      return { error: { message: 'Authentication service unavailable. Please check your internet connection and try again.' } }
     }
   }
 
@@ -70,9 +90,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
       })
+      
+      if (error) {
+        console.error('Supabase signIn error:', error)
+      }
+      
       return { error }
     } catch (error) {
-      return { error }
+      console.error('SignIn catch block error:', error)
+      return { error: { message: 'Authentication service unavailable. Please check your internet connection and try again.' } }
     }
   }
 
