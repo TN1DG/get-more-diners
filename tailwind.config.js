@@ -18,39 +18,78 @@ module.exports = {
           300: "#F0E6D2",
           400: "#E8D5B7",
           500: "#D4B896",
+          600: "#C4A57B",
         },
         
-        // Warm accent colors
+        // Enhanced warm accent colors
         amber: {
           50: "#FFF8E7",
           100: "#FFECB3",
+          200: "#FFE082",
+          300: "#FFD54F",
           400: "#FFC947",
           500: "#F59E0B", // Golden yellow
           600: "#D97706",
+          700: "#B45309",
         },
         
         terracotta: {
           50: "#FDF2F0",
           100: "#FCE4E0",
+          200: "#F8C5BD",
+          300: "#F4A79A",
           400: "#F87171",
           500: "#DC6844", // Muted red/orange
           600: "#C55A32",
+          700: "#A04A28",
+          800: "#7A3920",
         },
         
         sage: {
           50: "#F7F8F7",
           100: "#EEF0EE",
+          200: "#DDE2DD",
+          300: "#C4CCC4",
+          400: "#A5B3A5",
           500: "#8B9A8B", // Muted green
           600: "#6B7B6B",
+          700: "#5A6A5A",
         },
         
-        // Updated primary to warm orange
+        // New warm colors for restaurant theme
+        paprika: {
+          50: "#FEF4F2",
+          100: "#FDE8E4",
+          200: "#FAD2CC",
+          300: "#F6B3A7",
+          400: "#F08B7A",
+          500: "#E85D47",
+          600: "#D23F26",
+          700: "#B12F1A",
+        },
+        
+        saffron: {
+          50: "#FFFBEB",
+          100: "#FEF3C7",
+          200: "#FDE68A",
+          300: "#FCD34D",
+          400: "#FBBF24",
+          500: "#F59E0B",
+          600: "#D97706",
+          700: "#B45309",
+        },
+        
+        // Updated primary to warm terracotta
         primary: {
           DEFAULT: "#DC6844",
           50: "#FDF2F0",
           100: "#FCE4E0",
+          200: "#F8C5BD",
+          300: "#F4A79A",
+          400: "#F08B7A",
           500: "#DC6844",
           600: "#C55A32",
+          700: "#A04A28",
           foreground: "#FEFDF9",
         },
         
@@ -107,6 +146,29 @@ module.exports = {
         'elegant': '0 4px 20px rgba(44, 24, 16, 0.08)',
         'card': '0 2px 12px rgba(44, 24, 16, 0.06)',
         'button': '0 2px 8px rgba(220, 104, 68, 0.2)',
+        'warm': '0 4px 16px rgba(220, 104, 68, 0.15)',
+        'soft': '0 1px 3px rgba(44, 24, 16, 0.1)',
+      },
+      
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'bounce-gentle': 'bounceGentle 2s infinite',
+      },
+      
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        bounceGentle: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
       },
     },
   },

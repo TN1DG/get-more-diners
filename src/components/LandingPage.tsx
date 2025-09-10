@@ -8,6 +8,7 @@ import { AnimatedSection } from './animations/AnimatedSection'
 import { AnimatedButton } from './animations/AnimatedButton'
 import { AnimatedCard } from './animations/AnimatedCard'
 import { PageTransition } from './animations/PageTransition'
+import { Logo } from './ui/Logo'
 import { fadeInVariants, slideUpVariants, staggerContainerVariants, slideInLeftVariants, slideInRightVariants } from '../lib/animations'
 
 export const LandingPage: React.FC = () => {
@@ -27,12 +28,11 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <motion.div
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
-              <Link to="/" className="flex items-center hover:opacity-80 transition-all duration-300">
-                <ChefHat className="h-9 w-9 text-primary" />
-                <span className="ml-3 text-2xl font-serif font-semibold text-foreground">Get More Diners</span>
+              <Link to="/" className="hover:opacity-90 transition-all duration-300">
+                <Logo size="md" showTagline={false} />
               </Link>
             </motion.div>
             <motion.div 
@@ -126,16 +126,18 @@ export const LandingPage: React.FC = () => {
                   <ChefHat className="ml-2 h-5 w-5" />
                 </AnimatedButton>
               </Link>
-              <AnimatedButton 
-                variant="outline" 
-                className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 text-lg font-semibold rounded-2xl"
-                size="lg"
-              >
-                Watch Demo
-                <svg className="ml-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </AnimatedButton>
+              <Link to="/login?demo=true">
+                <AnimatedButton 
+                  variant="outline" 
+                  className="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 text-lg font-semibold rounded-2xl"
+                  size="lg"
+                >
+                  👀 Try Demo
+                  <svg className="ml-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </AnimatedButton>
+              </Link>
             </motion.div>
             
             <motion.div 
@@ -450,9 +452,8 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <Link to="/" className="flex items-center mb-4 hover:opacity-80 transition-opacity">
-                <ChefHat className="h-6 w-6 text-primary" />
-                <span className="ml-2 text-lg font-bold">Get More Diners</span>
+              <Link to="/" className="mb-4 hover:opacity-80 transition-opacity">
+                <Logo size="sm" showTagline={false} variant="white" />
               </Link>
               <p className="text-gray-400">
                 The easiest way for restaurants to connect with hungry customers.

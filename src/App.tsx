@@ -11,6 +11,7 @@ import { Dashboard } from './components/dashboard/Dashboard'
 import { RestaurantProfile } from './components/dashboard/RestaurantProfile'
 import { FindDiners } from './components/dashboard/FindDiners'
 import { CreateCampaign } from './components/dashboard/CreateCampaign'
+import { CampaignConfirmation } from './components/dashboard/CampaignConfirmation'
 import { PastCampaigns } from './components/dashboard/PastCampaigns'
 
 // Placeholder components for remaining dashboard routes
@@ -46,6 +47,7 @@ const AppRoutes: React.FC = () => {
           <Route path="profile" element={<RestaurantProfile />} />
           <Route path="diners" element={<FindDiners />} />
           <Route path="campaigns/new" element={<CreateCampaign />} />
+          <Route path="campaigns/confirmation" element={<CampaignConfirmation />} />
           <Route path="campaigns" element={<PastCampaigns />} />
           <Route path="settings" element={<Settings />} />
         </Route>

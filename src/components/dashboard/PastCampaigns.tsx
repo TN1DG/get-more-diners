@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import { isDemoMode, getDemoCampaigns, getDemoStats } from '../../lib/demoData'
 import { 
   BarChart3, 
   MessageSquare, 
@@ -29,7 +30,7 @@ interface Campaign {
   email_content: string
   sms_content: string | null
   target_count: number
-  status: 'draft' | 'sent'
+  status: string
   sent_at: string | null
 }
 
@@ -62,43 +63,49 @@ export const PastCampaigns: React.FC = () => {
     if (!user) return
 
     try {
-      // First, get the restaurant
-      const { data: restaurant, error: restaurantError } = await supabase
-        .from('restaurants')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+      if (isDemoMode()) {
+        // Use demo data
+        const demoData = getDemoCampaigns()
+        setCampaigns(demoData)
+        setStats(getDemoStats())
+      } else {
+        // First, get the restaurant
+        const { data: restaurant, error: restaurantError } = await supabase
+          .from('restaurants')
+          .select('id')
+          .eq('user_id', user.id)
+          .single()
 
-      if (restaurantError) {
-        console.error('No restaurant found:', restaurantError)
-        setLoading(false)
-        return
+        if (restaurantError) {
+          console.error('No restaurant found:', restaurantError)
+          setLoading(false)
+          return
+        }
+
+        // Then fetch campaigns
+        const { data, error } = await supabase
+          .from('campaigns')
+          .select('*')
+          .eq('restaurant_id', restaurant.id)
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+
+        setCampaigns(data || [])
+
+        // Calculate stats
+        const totalCampaigns = data?.length || 0
+        const draftCampaigns = data?.filter(c => c.status === 'draft').length || 0
+        const sentCampaigns = data?.filter(c => c.status === 'sent').length || 0
+        const totalReach = data?.reduce((sum, c) => sum + (c.status === 'sent' ? c.target_count : 0), 0) || 0
+
+        setStats({
+          totalCampaigns,
+          draftCampaigns,
+          sentCampaigns,
+          totalReach
+        })
       }
-
-      // Then fetch campaigns
-      const { data, error } = await supabase
-        .from('campaigns')
-        .select('*')
-        .eq('restaurant_id', restaurant.id)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      setCampaigns(data || [])
-
-      // Calculate stats
-      const totalCampaigns = data?.length || 0
-      const draftCampaigns = data?.filter(c => c.status === 'draft').length || 0
-      const sentCampaigns = data?.filter(c => c.status === 'sent').length || 0
-      const totalReach = data?.reduce((sum, c) => sum + (c.status === 'sent' ? c.target_count : 0), 0) || 0
-
-      setStats({
-        totalCampaigns,
-        draftCampaigns,
-        sentCampaigns,
-        totalReach
-      })
-
     } catch (error) {
       console.error('Error fetching campaigns:', error)
     } finally {
@@ -173,65 +180,65 @@ export const PastCampaigns: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Campaign Management</h1>
-          <p className="text-gray-600">
-            View and manage your marketing campaigns
+          <h1 className="text-3xl font-serif font-bold text-foreground">📈 Track Your Campaign Success</h1>
+          <p className="text-muted-foreground mt-2">
+            See how your marketing efforts are bringing more customers to your tables
           </p>
         </div>
         <Link to="/dashboard/campaigns/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            New Campaign
+          <Button className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-warm" size="lg">
+            <Plus className="h-5 w-5 mr-2" />
+            ✨ Create New Campaign
           </Button>
         </Link>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:shadow-warm transition-all duration-200">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Campaigns</p>
-                <p className="text-2xl font-bold">{stats.totalCampaigns}</p>
+                <p className="text-sm font-semibold text-muted-foreground mb-1">📊 Total Campaigns</p>
+                <p className="text-3xl font-serif font-bold text-foreground">{stats.totalCampaigns}</p>
               </div>
-              <BarChart3 className="h-8 w-8 text-blue-600" />
+              <BarChart3 className="h-10 w-10 text-primary" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20 hover:shadow-warm transition-all duration-200">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Draft Campaigns</p>
-                <p className="text-2xl font-bold">{stats.draftCampaigns}</p>
+                <p className="text-sm font-semibold text-muted-foreground mb-1">📋 Ready to Send</p>
+                <p className="text-3xl font-serif font-bold text-foreground">{stats.draftCampaigns}</p>
               </div>
-              <Edit className="h-8 w-8 text-orange-600" />
+              <Edit className="h-10 w-10 text-amber-600" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="bg-gradient-to-br from-sage-500/10 to-sage-500/5 border-sage-500/20 hover:shadow-warm transition-all duration-200">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Sent Campaigns</p>
-                <p className="text-2xl font-bold">{stats.sentCampaigns}</p>
+                <p className="text-sm font-semibold text-muted-foreground mb-1">🚀 Offers Sent</p>
+                <p className="text-3xl font-serif font-bold text-foreground">{stats.sentCampaigns}</p>
               </div>
-              <Send className="h-8 w-8 text-green-600" />
+              <Send className="h-10 w-10 text-sage-600" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
+        <Card className="bg-gradient-to-br from-terracotta-500/10 to-terracotta-500/5 border-terracotta-500/20 hover:shadow-warm transition-all duration-200">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Reach</p>
-                <p className="text-2xl font-bold">{stats.totalReach}</p>
+                <p className="text-sm font-semibold text-muted-foreground mb-1">🍽️ Diners Reached</p>
+                <p className="text-3xl font-serif font-bold text-foreground">{stats.totalReach.toLocaleString()}</p>
               </div>
-              <TrendingUp className="h-8 w-8 text-purple-600" />
+              <TrendingUp className="h-10 w-10 text-terracotta-600" />
             </div>
           </CardContent>
         </Card>
@@ -240,25 +247,28 @@ export const PastCampaigns: React.FC = () => {
       {/* Campaigns List */}
       <Card>
         <CardHeader>
-          <CardTitle>Your Campaigns</CardTitle>
-          <CardDescription>
-            Manage your marketing campaigns and track their performance
+          <CardTitle className="text-2xl font-serif">🏆 Your Marketing Campaigns</CardTitle>
+          <CardDescription className="text-base">
+            Manage your offers and see how they're bringing more customers to your restaurant
           </CardDescription>
         </CardHeader>
         <CardContent>
           {campaigns.length === 0 ? (
-            <div className="text-center py-8">
-              <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No campaigns yet</h3>
-              <p className="text-gray-600 mb-4">
-                Create your first marketing campaign to start attracting more diners.
+            <div className="text-center py-12">
+              <MessageSquare className="h-16 w-16 text-primary/40 mx-auto mb-6" />
+              <h3 className="text-2xl font-serif font-bold text-foreground mb-3">You haven't sent any offers yet</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Try creating your first irresistible deal to bring more hungry customers to your restaurant!
               </p>
               <Link to="/dashboard/campaigns/new">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Campaign
+                <Button className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-warm" size="lg">
+                  <Plus className="h-5 w-5 mr-2" />
+                  ✨ Create My First Campaign
                 </Button>
               </Link>
+              <p className="text-sm text-sage-600 mt-4">
+                💡 Most restaurants see results within 24-48 hours!
+              </p>
             </div>
           ) : (
             <div className="space-y-4">

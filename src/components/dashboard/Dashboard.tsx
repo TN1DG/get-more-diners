@@ -18,6 +18,7 @@ import { AnimatedCard } from '../animations/AnimatedCard'
 import { AnimatedButton } from '../animations/AnimatedButton'
 import { AnimatedSection } from '../animations/AnimatedSection'
 import { staggerContainerVariants, slideUpVariants, fadeInVariants } from '../../lib/animations'
+import { isDemoMode, getDemoRestaurant, getDemoStats } from '../../lib/demoData'
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth()
@@ -35,35 +36,47 @@ export const Dashboard: React.FC = () => {
       if (!user) return
 
       try {
-        // Fetch restaurant profile
-        const { data: restaurantData } = await supabase
-          .from('restaurants')
-          .select('*')
-          .eq('user_id', user.id)
-          .single()
-
-        setRestaurant(restaurantData)
-
-        // Fetch campaign stats
-        if (restaurantData) {
-          const { data: campaigns } = await supabase
-            .from('campaigns')
-            .select('*')
-            .eq('restaurant_id', restaurantData.id)
-
-          const thisMonth = new Date()
-          thisMonth.setDate(1) // First day of current month
-
-          const campaignsThisMonth = campaigns?.filter(
-            campaign => new Date(campaign.created_at) >= thisMonth
-          ).length || 0
-
+        if (isDemoMode()) {
+          // Use demo data
+          setRestaurant(getDemoRestaurant())
+          const demoStats = getDemoStats();
           setStats({
-            totalCampaigns: campaigns?.length || 0,
-            totalContacts: 1250, // Sample data - would be calculated from actual diner selections
-            campaignsThisMonth,
-            successRate: 85 // Sample success rate
+            totalCampaigns: demoStats.totalCampaigns,
+            totalContacts: 1250, // Using sample data as in non-demo mode
+            campaignsThisMonth: demoStats.campaignsThisMonth,
+            successRate: demoStats.successRate,
           })
+        } else {
+          // Fetch restaurant profile
+          const { data: restaurantData } = await supabase
+            .from('restaurants')
+            .select('*')
+            .eq('user_id', user.id)
+            .single()
+
+          setRestaurant(restaurantData)
+
+          // Fetch campaign stats
+          if (restaurantData) {
+            const { data: campaigns } = await supabase
+              .from('campaigns')
+              .select('*')
+              .eq('restaurant_id', restaurantData.id)
+
+            const thisMonth = new Date()
+            thisMonth.setDate(1) // First day of current month
+
+            const campaignsThisMonth = campaigns?.filter(
+              campaign => new Date(campaign.created_at) >= thisMonth
+            ).length || 0
+
+            setStats({
+              totalCampaigns: campaigns?.length || 0,
+              totalContacts: 1250, // Sample data - would be calculated from actual diner selections
+              campaignsThisMonth,
+              successRate: 85 // Sample success rate
+            })
+          }
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error)
@@ -118,7 +131,7 @@ export const Dashboard: React.FC = () => {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          Welcome back, {restaurant.name}!
+          Welcome back, {restaurant.name}! 🍴
         </motion.h2>
         <motion.p 
           className="text-xl text-muted-foreground leading-relaxed"
@@ -126,7 +139,7 @@ export const Dashboard: React.FC = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Here's what's happening with your restaurant marketing today.
+          Your marketing dashboard shows how you're growing your customer base and filling more tables.
         </motion.p>
       </AnimatedSection>
 
@@ -141,7 +154,7 @@ export const Dashboard: React.FC = () => {
         <motion.div variants={slideUpVariants}>
           <AnimatedCard className="bg-white rounded-2xl shadow-card border border-cream-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-6">
-              <CardTitle className="text-base font-semibold text-muted-foreground">Total Campaigns</CardTitle>
+              <CardTitle className="text-base font-semibold text-muted-foreground">📢 Marketing Campaigns</CardTitle>
               <motion.div 
                 className="p-3 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl"
                 whileHover={{ scale: 1.1, rotate: 5 }}
@@ -160,7 +173,7 @@ export const Dashboard: React.FC = () => {
                 {stats.totalCampaigns}
               </motion.div>
               <p className="text-sm text-muted-foreground">
-                {stats.campaignsThisMonth} this month
+                {stats.campaignsThisMonth} sent this month
               </p>
             </CardContent>
           </AnimatedCard>
@@ -168,22 +181,22 @@ export const Dashboard: React.FC = () => {
 
         <Card className="bg-white rounded-2xl shadow-card border border-cream-200 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-6">
-            <CardTitle className="text-base font-semibold text-muted-foreground">Total Contacts</CardTitle>
+            <CardTitle className="text-base font-semibold text-muted-foreground">🍽️ Hungry Locals</CardTitle>
             <div className="p-3 bg-gradient-to-br from-amber-500/10 to-amber-500/20 rounded-xl">
               <Users className="h-6 w-6 text-amber-600" />
             </div>
           </CardHeader>
           <CardContent className="pb-6">
-            <div className="text-3xl font-serif font-bold text-foreground mb-1">{stats.totalContacts}</div>
+            <div className="text-3xl font-serif font-bold text-foreground mb-1">{stats.totalContacts.toLocaleString()}</div>
             <p className="text-sm text-muted-foreground">
-              Available diners in your area
+              potential diners in your area
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-white rounded-2xl shadow-card border border-cream-200 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-6">
-            <CardTitle className="text-base font-semibold text-muted-foreground">Success Rate</CardTitle>
+            <CardTitle className="text-base font-semibold text-muted-foreground">📈 Success Rate</CardTitle>
             <div className="p-3 bg-gradient-to-br from-sage-500/10 to-sage-500/20 rounded-xl">
               <TrendingUp className="h-6 w-6 text-sage-600" />
             </div>
@@ -191,14 +204,14 @@ export const Dashboard: React.FC = () => {
           <CardContent className="pb-6">
             <div className="text-3xl font-serif font-bold text-foreground mb-1">{stats.successRate}%</div>
             <p className="text-sm text-muted-foreground">
-              Campaign engagement rate
+              customers engaged with offers
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-white rounded-2xl shadow-card border border-cream-200 hover:shadow-elegant transition-all duration-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 pt-6">
-            <CardTitle className="text-base font-semibold text-muted-foreground">This Month</CardTitle>
+            <CardTitle className="text-base font-semibold text-muted-foreground">📅 This Month</CardTitle>
             <div className="p-3 bg-gradient-to-br from-terracotta-500/10 to-terracotta-500/20 rounded-xl">
               <BarChart3 className="h-6 w-6 text-terracotta-600" />
             </div>
@@ -206,7 +219,7 @@ export const Dashboard: React.FC = () => {
           <CardContent className="pb-6">
             <div className="text-3xl font-serif font-bold text-foreground mb-1">{stats.campaignsThisMonth}</div>
             <p className="text-sm text-muted-foreground">
-              Campaigns sent
+              offers sent to diners
             </p>
           </CardContent>
         </Card>
@@ -214,30 +227,30 @@ export const Dashboard: React.FC = () => {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-gradient-to-br from-primary/5 via-background to-amber/5 border-primary/10">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="text-xl font-serif">🚀 Ready to Fill More Tables?</CardTitle>
             <CardDescription>
-              Get started with these common tasks
+              Take action to bring more hungry customers to your restaurant
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Link to="/dashboard/diners">
-              <Button className="w-full justify-start">
+              <Button className="w-full justify-start bg-primary hover:bg-primary/90 text-white shadow-warm">
                 <Users className="h-4 w-4 mr-2" />
-                Find New Diners
+                🔍 Find hungry locals near you
               </Button>
             </Link>
             <Link to="/dashboard/campaigns/new">
               <Button className="w-full justify-start" variant="outline">
                 <MessageSquare className="h-4 w-4 mr-2" />
-                Create New Campaign
+                ✨ Craft irresistible deals with AI
               </Button>
             </Link>
             <Link to="/dashboard/campaigns">
               <Button className="w-full justify-start" variant="outline">
                 <BarChart3 className="h-4 w-4 mr-2" />
-                View Past Campaigns
+                📈 Track your campaign success
               </Button>
             </Link>
           </CardContent>
@@ -245,21 +258,21 @@ export const Dashboard: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Restaurant Profile</CardTitle>
+          <CardTitle className="text-xl font-serif">🏪 Your Restaurant</CardTitle>
             <CardDescription>
-              Your current restaurant information
+              Make sure your profile attracts the right diners
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div>
-                <span className="font-medium">Name:</span> {restaurant.name}
+                <span className="font-medium text-foreground">🍴 Name:</span> <span className="text-muted-foreground">{restaurant.name}</span>
               </div>
               <div>
-                <span className="font-medium">Location:</span> {restaurant.city}, {restaurant.state}
+                <span className="font-medium text-foreground">📍 Location:</span> <span className="text-muted-foreground">{restaurant.city}, {restaurant.state}</span>
               </div>
               <div>
-                <span className="font-medium">Cuisine:</span> {restaurant.cuisine_type}
+                <span className="font-medium text-foreground">🍲 Cuisine:</span> <span className="text-muted-foreground">{restaurant.cuisine_type}</span>
               </div>
               <div className="pt-4">
                 <Link to="/dashboard/profile">

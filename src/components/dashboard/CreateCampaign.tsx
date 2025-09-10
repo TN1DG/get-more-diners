@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
@@ -38,34 +39,60 @@ interface CampaignData {
 
 const CAMPAIGN_TEMPLATES = [
   {
-    name: 'Grand Opening Special',
-    description: 'Perfect for new restaurants or location openings',
-    prompt: 'grand opening celebration with special offers'
+    name: 'Happy Hour Special',
+    emoji: '🍸',
+    description: 'Drive traffic during slower afternoon/evening hours',
+    prompt: 'happy hour deals with discounted drinks and appetizers',
+    category: 'promotion'
   },
   {
-    name: 'Happy Hour Promotion',
-    description: 'Drive traffic during slower hours',
-    prompt: 'happy hour deals and drink specials'
+    name: 'Holiday Special',
+    emoji: '🎉',
+    description: 'Celebrate holidays with themed offers',
+    prompt: 'holiday-themed menu specials and festive dining experience',
+    category: 'seasonal'
   },
   {
-    name: 'Seasonal Menu Launch',
-    description: 'Promote new seasonal dishes and ingredients',
-    prompt: 'new seasonal menu with fresh ingredients'
+    name: 'Loyalty Discount',
+    emoji: '⭐',
+    description: 'Reward your most loyal customers',
+    prompt: 'exclusive loyalty program benefits and returning customer rewards',
+    category: 'retention'
   },
   {
-    name: 'Weekend Special',
-    description: 'Boost weekend reservations',
-    prompt: 'weekend dining special and family offers'
-  },
-  {
-    name: 'Loyalty Rewards',
-    description: 'Reward returning customers',
-    prompt: 'customer loyalty program and exclusive rewards'
+    name: 'Weekend Family Special',
+    emoji: '👨‍👩‍👧‍👦',
+    description: 'Attract families for weekend dining',
+    prompt: 'family-friendly weekend specials with kids menu discounts',
+    category: 'family'
   },
   {
     name: 'Date Night Package',
-    description: 'Romantic dining experiences',
-    prompt: 'romantic date night package with special ambiance'
+    emoji: '❤️',
+    description: 'Create romantic dining experiences for couples',
+    prompt: 'romantic date night package with wine pairings and intimate setting',
+    category: 'romance'
+  },
+  {
+    name: 'Grand Opening',
+    emoji: '🎆',
+    description: 'Launch your restaurant with a bang',
+    prompt: 'grand opening celebration with special introductory offers',
+    category: 'launch'
+  },
+  {
+    name: 'New Menu Launch',
+    emoji: '🍽️',
+    description: 'Showcase new seasonal dishes',
+    prompt: 'exciting new menu items and chef-curated seasonal specials',
+    category: 'menu'
+  },
+  {
+    name: 'Business Lunch Deal',
+    emoji: '💼',
+    description: 'Target nearby office workers',
+    prompt: 'quick and delicious business lunch options with express service',
+    category: 'business'
   }
 ]
 
@@ -267,10 +294,16 @@ P.S. Don't forget to bring your friends and family!`,
 
       if (error) throw error
       
-      setSuccess('Campaign saved successfully!')
-      setTimeout(() => {
-        navigate('/dashboard/campaigns')
-      }, 2000)
+      // Navigate to confirmation page with campaign data
+      navigate('/dashboard/campaigns/confirmation', {
+        state: {
+          name: campaignData.name,
+          targetCount: campaignData.target_count,
+          city: restaurant.city,
+          state: restaurant.state,
+          channels: ['email', 'sms']
+        }
+      })
 
     } catch (error: any) {
       setError(error.message)
@@ -319,9 +352,12 @@ P.S. Don't forget to bring your friends and family!`,
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Create Marketing Campaign</h1>
-          <p className="text-gray-600">
-            Use AI to generate compelling marketing content for {restaurant.name}
+          <h1 className="text-3xl font-serif font-bold text-foreground">✨ Craft Irresistible Deals with AI</h1>
+          <p className="text-muted-foreground mt-2">
+            Create compelling offers that bring more customers to {restaurant.name}
+          </p>
+          <p className="text-sm text-sage-600 mt-1">
+            💡 Don't worry - you can always edit and preview before sending!
           </p>
         </div>
         {selectedDiners.length > 0 && (
@@ -347,67 +383,75 @@ P.S. Don't forget to bring your friends and family!`,
       )}
 
       {/* Campaign Templates */}
-      <Card>
+        <Card className="bg-gradient-to-br from-primary/5 via-background to-amber/5 border-primary/10">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Wand2 className="h-5 w-5 mr-2" />
-            AI Campaign Generator
+          <CardTitle className="flex items-center text-xl font-serif">
+            <Wand2 className="h-6 w-6 mr-3 text-primary" />
+            🤖 AI-Powered Offer Templates
           </CardTitle>
-          <CardDescription>
-            Choose a template or describe your campaign to generate content with AI
+          <CardDescription className="text-base">
+            Pick a proven template to instantly generate compelling offers that drive reservations
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {/* Templates */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Choose a Campaign Template
+              <label className="block text-base font-semibold text-foreground mb-4">
+                🎯 Choose Your Campaign Type
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {CAMPAIGN_TEMPLATES.map(template => (
-                  <button
+                  <motion.button
                     key={template.name}
                     onClick={() => setSelectedTemplate(template.name)}
-                    className={`p-4 text-left border rounded-lg transition-colors ${
+                    className={`p-4 text-left border-2 rounded-2xl transition-all duration-200 ${
                       selectedTemplate === template.name
-                        ? 'border-primary bg-primary/5'
-                        : 'border-gray-200 hover:border-primary/50'
+                        ? 'border-primary bg-primary/10 shadow-warm transform scale-105'
+                        : 'border-cream-300 hover:border-primary/50 hover:bg-primary/5 hover:transform hover:scale-102'
                     }`}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <h3 className="font-medium text-gray-900">{template.name}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{template.description}</p>
-                  </button>
+                    <div className="text-2xl mb-2">{template.emoji}</div>
+                    <h3 className="font-semibold text-foreground text-sm mb-1">{template.name}</h3>
+                    <p className="text-xs text-muted-foreground">{template.description}</p>
+                  </motion.button>
                 ))}
               </div>
             </div>
 
             {/* Custom Prompt */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Or Describe Your Campaign (Optional)
+              <label className="block text-base font-semibold text-foreground mb-2">
+                📝 Or Describe Your Own Campaign
               </label>
               <Input
-                placeholder="e.g., Valentine's Day special with 20% off couples dinner..."
+                placeholder="e.g., Valentine's Day special with 20% off couples dinner and complimentary dessert..."
                 value={customPrompt}
                 onChange={(e) => setCustomPrompt(e.target.value)}
+                className="focus:border-primary focus:ring-primary text-base p-4"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Be specific about your offer, target audience, and what makes it special
+              </p>
             </div>
 
             <Button
               onClick={generateContent}
               disabled={generating || (!selectedTemplate && !customPrompt)}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-primary to-terracotta-500 hover:from-primary/90 hover:to-terracotta-500/90 text-white font-semibold py-4 text-lg shadow-warm"
+              size="lg"
             >
               {generating ? (
                 <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Generating Content...
+                  <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
+                  🤖 AI is crafting your perfect offer...
                 </>
               ) : (
                 <>
-                  <Wand2 className="h-4 w-4 mr-2" />
-                  Generate Campaign Content
+                  <Wand2 className="h-5 w-5 mr-2" />
+                  ✨ Generate My Irresistible Offer
                 </>
               )}
             </Button>
@@ -539,9 +583,11 @@ P.S. Don't forget to bring your friends and family!`,
         <Button 
           onClick={saveCampaign} 
           disabled={saving || !campaignData.name || !campaignData.subject || !campaignData.email_content}
+          className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-warm"
+          size="lg"
         >
-          <Save className="h-4 w-4 mr-2" />
-          {saving ? 'Saving...' : 'Save Campaign'}
+          <Send className="h-5 w-5 mr-2" />
+          {saving ? '🚀 Sending your irresistible offer...' : '🚀 Send Campaign Now'}
         </Button>
       </div>
     </div>

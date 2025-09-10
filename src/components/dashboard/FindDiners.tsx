@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import { isDemoMode, getDemoDiners } from '../../lib/demoData'
 import { 
   Users, 
   Search, 
@@ -77,13 +78,18 @@ export const FindDiners: React.FC = () => {
 
   const fetchDiners = async () => {
     try {
-      const { data, error } = await supabase
-        .from('diners')
-        .select('*')
-        .order('name')
+      if (isDemoMode()) {
+        // Use demo data
+        setDiners(getDemoDiners())
+      } else {
+        const { data, error } = await supabase
+          .from('diners')
+          .select('*')
+          .order('name')
 
-      if (error) throw error
-      setDiners(data || [])
+        if (error) throw error
+        setDiners(data || [])
+      }
     } catch (error) {
       console.error('Error fetching diners:', error)
     } finally {
@@ -229,9 +235,10 @@ export const FindDiners: React.FC = () => {
                 state: { selectedDiners } 
               })}
               disabled={selectedDiners.length === 0}
-              className="w-full"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 shadow-warm"
+              size="lg"
             >
-              Create Campaign ({selectedDiners.length})
+              🚀 Create Campaign ({selectedDiners.length})
             </Button>
           </CardContent>
         </Card>
@@ -242,21 +249,23 @@ export const FindDiners: React.FC = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center">
-                <Search className="h-5 w-5 mr-2" />
-                Find Diners
+              <CardTitle className="flex items-center text-2xl font-serif">
+                <Search className="h-6 w-6 mr-3 text-primary" />
+                Find hungry locals near your restaurant
               </CardTitle>
-              <CardDescription>
-                Search and filter diners to create targeted marketing campaigns
+              <CardDescription className="text-base text-muted-foreground mt-2">
+                Discover potential customers in your area and send them irresistible offers.
+                <span className="block mt-1 text-sm text-sage-600">💡 You can always preview and edit before sending</span>
               </CardDescription>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              {showFilters ? 'Hide' : 'Show'} Filters
-            </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className="bg-primary/5 border-primary/20 text-primary hover:bg-primary hover:text-white"
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                {showFilters ? 'Hide' : 'Show'} Advanced Filters
+              </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -264,23 +273,25 @@ export const FindDiners: React.FC = () => {
             {/* Basic Search */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Name
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  🍽️ Diner Name
                 </label>
                 <Input
                   placeholder="Search by name..."
                   value={filters.name}
                   onChange={(e) => handleFilterChange('name', e.target.value)}
+                  className="focus:border-primary focus:ring-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  📧 Email Address
                 </label>
                 <Input
                   placeholder="Search by email..."
                   value={filters.email}
                   onChange={(e) => handleFilterChange('email', e.target.value)}
+                  className="focus:border-primary focus:ring-primary"
                 />
               </div>
             </div>
@@ -290,28 +301,30 @@ export const FindDiners: React.FC = () => {
               <div className="border-t pt-4 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      📱 Phone Number
                     </label>
                     <Input
                       placeholder="Search by phone..."
                       value={filters.phone}
                       onChange={(e) => handleFilterChange('phone', e.target.value)}
+                      className="focus:border-primary focus:ring-primary"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      📍 City
                     </label>
                     <Input
-                      placeholder="Search by city..."
+                      placeholder="e.g., Austin, Dallas..."
                       value={filters.city}
                       onChange={(e) => handleFilterChange('city', e.target.value)}
+                      className="focus:border-primary focus:ring-primary"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      State
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      🏛️ State
                     </label>
                     <select
                       value={filters.state}
@@ -328,8 +341,8 @@ export const FindDiners: React.FC = () => {
 
                 {/* Interests Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Interests
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    🍴 Food Interests & Preferences
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {COMMON_INTERESTS.map(interest => (
@@ -404,10 +417,13 @@ export const FindDiners: React.FC = () => {
         {filteredDiners.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">
-              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No diners found</h3>
-              <p className="text-gray-600">
-                Try adjusting your search criteria to find more diners.
+              <Users className="h-12 w-12 text-primary/40 mx-auto mb-4" />
+              <h3 className="text-xl font-serif font-semibold text-foreground mb-2">No hungry diners found yet</h3>
+              <p className="text-muted-foreground">
+                Try adjusting your search criteria to discover more potential customers in your area.
+              </p>
+              <p className="text-sm text-sage-600 mt-2">
+                💡 Tip: Start with broader search terms, then narrow down
               </p>
             </CardContent>
           </Card>
